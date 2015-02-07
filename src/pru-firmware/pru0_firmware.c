@@ -63,7 +63,8 @@ int get_var_val(int addr)
 			//would have added 1. this should be taken care of.
 
 			addr -= DIO_OFF;
-			return GET_BIT(__R31, addr);
+			//return GET_BIT(__R31, addr);
+			return GET_BIT(read_r31(), addr);
 		}
 	}
 
@@ -104,12 +105,14 @@ void dio_handler(int opcode, u32 inst)
 	}
 	/* set hi*/
 	if(val2 && (val1 < MAX_DIO)){ 
-        	__R30 = __R30 | ( 1 << val1);
+        	/* __R30 = __R30 | ( 1 << val1); */
+		write_r30(read_r30() | (1 << val1));
         }
 
 	/* set low*/
         else{ 
-        	__R30 = __R30 & ~( 1 << val1);
+        	/* __R30 = __R30 & ~( 1 << val1); */
+		write_r30(read_r30() & ~(1 << val1));
         }
 	
 	if(single_command)
@@ -562,10 +565,12 @@ static int handle_downcall(u32 id, u32 arg0, u32 arg1, u32 arg2,
 	{
 		case SYS_DEBUG:
 			if(arg0){
-				__R30 = 0x0000FFFF;
+				//__R30 = 0x0000FFFF;
+				write_r30(0x0000FFFF);
 			}
 			else{
-				__R30 = 0x00000000;
+				//__R30 = 0x00000000;
+				write_r30(0x00000000);
 			}
 		break;
 

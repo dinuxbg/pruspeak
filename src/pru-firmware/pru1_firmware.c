@@ -70,7 +70,8 @@ int main()
 			j |= i << pwm_sys[7].pin;
 			
 			//assign to the output
-			__R30 = j;
+			//__R30 = j;
+			write_r30(j);
 
 		/* inc the counter */
 			units_elapsed++;

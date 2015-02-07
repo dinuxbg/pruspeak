@@ -1,7 +1,11 @@
+#include <pru/io.h>
+
 typedef unsigned int u32;
 
+/*
 volatile register unsigned int __R30;
 volatile register unsigned int __R31;
+*/
 
 /* The number of PRU's that exist */
 #define NUM_PRU		2
@@ -17,10 +21,15 @@ volatile register unsigned int __R31;
 #define EV_ARM_PRU1	22
 
 
+#if 0
 __far volatile char C0[0x300] __attribute__((cregister("C0", far)));
 
 #define PINTC(_reg) \
 	(*(volatile u32 *)((char *)&C0[_reg]))
+#endif
+
+#define PINTC(_reg) \
+	(((volatile u32 *)(0x00020000))[_reg])
 
 #define PINTC_SISR		PINTC(0x0020)
 #define PINTC_SICR		PINTC(0x0024)
@@ -32,7 +41,8 @@ __far volatile char C0[0x300] __attribute__((cregister("C0", far)));
 /* Macro to set a system event */
 #define SIGNAL_EVENT(x) \
 	do { \
-		__R31 = (1 << 5) | ((x) - 16); \
+		/* __R31 = (1 << 5) | ((x) - 16); */ \
+		write_r31((1 << 5) | ((x) - 16)); \
 	} while(0);
 
 /* Macro to check a system event */
@@ -46,10 +56,15 @@ __far volatile char C0[0x300] __attribute__((cregister("C0", far)));
 	} while(0);
 
 
+#if 0
 __far volatile char C4[0x100] __attribute__((cregister("C4", near)));	/* PRUCFG */
 
 #define PRUCFG(_reg) \
 	(*(volatile u32 *)((char *)&C4 + (_reg)))
+#endif
+
+#define PRUCFG(_reg) \
+	(((volatile u32 *)(0x00026000))[_reg])
 
 #define PRUCFG_SYSCFG		PRUCFG(0x0004)
 #define SYSCFG_STANDBY_INIT	(1 << 4)
@@ -57,9 +72,14 @@ __far volatile char C4[0x100] __attribute__((cregister("C4", near)));	/* PRUCFG 
 #define PRUCFG_DISABLE_GLOBAL	PRUCFG_SYSCFG = PRUCFG_SYSCFG | SYSCFG_STANDBY_INIT
 
 
+#if 0
 __far volatile char C26[0x100] __attribute__((cregister("C26", near)));	/* PRUIEP */
 #define PIEP(_reg) \
 	(*(volatile u32 *)((char *)&C26 + (_reg)))
+#endif
+
+#define PIEP(_reg) \
+	(((volatile u32 *)(0x0002E000))[_reg])
 
 #define PIEP_GLOBAL_CFG		PIEP(0x0000)
 #define  GLOBAL_CFG_CNT_ENABLE		(1 << 0)
